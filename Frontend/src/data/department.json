@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Human Resources",
+        "count": 12
+    },
+    {
+        "name": "Engineering",
+        "count": 5
+    },
+    {
+        "name": "Marketing",
+        "count": 3
+    },
+    {
+        "name": "Sales",
+        "count": 4
+    },
+    {
+        "name": "Finance",
+        "count": 2
+    }
+]

@@ -1,35 +1,46 @@
-import employees from '../data/employees.js'
+import { Pencil, Trash2 } from "lucide-react";
+function EmployeeCard({employees}) {
 
-function EmployeeCard() {
     return (
-        <div className="employee-cards grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4 grow">
-            {employees.map(employee => (
-                <div key={employee.id} className="employee-card employee-card w-full min-h-60 mx-auto bg-white rounded-xl shadow-md border p-4">
-                    <div className="flex items-center justify-between gap-3 mb-4">
-                        <img className="rounded-full w-24 h-24 object-cover" src={employee.img} alt={employee.name} />
-                        <div className="">
-                            <h2 className="text-xl font-bold text-gray-900">{employee.name}</h2>
-                            <p className="text-sm text-gray-500">{employee.position}</p>
-                        </div>
-                    </div>
-                    <p className="bg-indigo-300 text-indigo-700 text-bold rounded-full px-3 py-1 inline">{employee.department}</p>
-                    <p className="text-gray-600 mt-2">Email: {employee.email}</p>
-                    <div className="flex items-center justify-between gap-3 mt-auto pt-4">
-                        <p className="text-gray-600 ">Salary:<b>${employee.salary.toLocaleString()}</b></p>
-                        <div className="flex space-x-2 ">
-                            <button className="bg-blue-400 hover:bg-blue-500 font-bold py-2 px-4 rounded">
-                                <img src="https://www.svgrepo.com/show/458430/view.svg" alt="View" className="w-5 h-5 invert" />
-                            </button>
-                            <button className="bg-red-400 hover:bg-red-500 font-bold py-2 px-4 rounded">
-                                <img src="https://www.svgrepo.com/show/502614/delete.svg" alt="Delete" className="w-5 h-5 invert" />
-                            </button>
-                            <button className="bg-green-400 hover:bg-green-500 font-bold py-2 px-4 rounded">
-                                <img src="https://www.svgrepo.com/show/509911/edit.svg" alt="Edit" className="w-5 h-5 invert" />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            ))}
+        <div className="EmployeeCard flex flex-col rounded-md m-4 items-start justify-center p-4 bg-white shadow-md">
+            <table className="w-full border-collapse">
+                <thead className="bg-gray-100">
+                    <tr className="text-center ">
+                        <th className="p-2 border-b font-Medium">ID</th>
+                        <th className="p-2 border-b font-Medium">Employee</th>
+                        <th className="p-2 border-b font-Medium">Department</th>
+                        <th className="p-2 border-b font-Medium">Position</th>
+                        <th className="p-2 border-b font-Medium">Joining Date</th>
+                        <th className="p-2 border-b font-Medium">Status</th>
+                        <th className="p-2 border-b font-Medium">Action</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                    {employees.map(employee => (
+                        <tr className="hover:bg-gray-100" key={employee.id}>
+                            <td className="p-2 border-b font-Medium">{employee.id}</td>
+                            <td className="p-2 border-b font-Medium">
+                                <div className="flex flex-col  gap-2">
+                                    <span>{employee.name}</span>
+                                    <span>{employee.email}</span>
+                                </div>
+                            </td>
+                            <td className="p-2 border-b font-Medium">{employee.department}</td>
+                            <td className='p-2 border-b font-Medium'>{employee.position}</td>
+                            <td className='p-2 border-b font-Medium'>{employee.joiningDate}</td>
+                            <td className="p-2 border-b font-Medium">{employee.status}</td>
+                            <td className="p-2 border-b font-Medium">
+                                <button className="text-black hover:bg-gray-200 font-bold py-1 px-2 rounded">
+                                    <Pencil size={16} />
+                                </button>
+                                <button className="text-red-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2">
+                                    <Trash2 size={16} />
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     )
 }
