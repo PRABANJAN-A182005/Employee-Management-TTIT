@@ -5,7 +5,9 @@ import Dashboard from './Dashboard.jsx';
 import EmployeeMangement from './EmployeeManagement.jsx';
 import Recruitment from './Recruitment.jsx';
 import Login from './Login.jsx';
-import EditEmployee from "./Pages/EditEmployee";
+import EditEmployee from "./EditEmployee";
+import AddEmployee from "./AddEmployee.jsx";
+import EmployeeDetails from './EmployeeDetails.jsx';
 
 function AppLayout() {
     const location = useLocation();
@@ -36,6 +38,8 @@ function AppLayout() {
                     <Route path="/dashboard" element={<Dashboard onMenuClick={handleMenuClick} />} />
                     <Route path="/recruitment" element={<Recruitment onMenuClick={handleMenuClick} />} />
                     <Route path="/employees/edit/:id" element={<EditEmployee onMenuClick={handleMenuClick}/>}/>
+                    <Route path="/employees/:id" element={<EmployeeDetails onMenuClick={handleMenuClick}/>}/>
+                    <Route path="/employees/add" element={<AddEmployee onMenuClick={handleMenuClick}/>}/>
                 </Routes>
             </main>
 

@@ -5,6 +5,7 @@ import {
     BriefcaseBusiness,
     Bell,Settings, LogOut
 } from "lucide-react";
+import logo from '../assets/hrm.jpg';
 import { NavLink  , useNavigate } from "react-router-dom";
 
 
@@ -26,6 +27,7 @@ function SideBar({ isOpen }) {
     <nav className="bg-gray-100 flex flex-col justify-between w-64 h-screen border-r shadow-md">
       <div>
       <div className="border-b h-19.5 flex items-center justify-center">
+        <img src={logo} className="w-12 h-12 rounded-3xl object-contain" alt="LOGO" />
         <h1 className="text-xl font-semibold text-center text-gray-900 p-2">HRMS Portal</h1>
       </div>
 

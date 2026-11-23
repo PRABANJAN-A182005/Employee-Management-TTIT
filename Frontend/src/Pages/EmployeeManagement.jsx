@@ -1,10 +1,12 @@
-import { Bell, LoaderCircle, Menu , X   } from 'lucide-react';
+import { Bell , Menu , X   } from 'lucide-react';
 import EmployeeTable from '../components/EmployeeTable.jsx';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Loaders from '../components/Loaders.jsx'
 // import statusData from "../data/status.json";
 // import employees from '../data/employees.json';
 import DropDown from "../components/DropDown.jsx";
-import { getEmployees } from "../services/employeeService.js"
+import { getEmployees, deleteEmployee } from "../services/employeeService.js"
 
 function EmployeeManagement({onMenuClick , isOpen}) {
     const notificationCount = 3;
@@ -13,12 +15,13 @@ function EmployeeManagement({onMenuClick , isOpen}) {
     const [selectedDepartment, setSelectedDepartment] = useState('');
     const [selectedEmpId, setSelectedEmpId] = useState('');
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await getEmployees();
                 setLoading(true);
+                const data = await getEmployees();
                 setEmployees(data);
 
             } catch (error) {
@@ -32,6 +35,12 @@ function EmployeeManagement({onMenuClick , isOpen}) {
         fetchData();
     }, []);
 
+    const handleDeleteEmployee = async (id) => {
+        await deleteEmployee(id);
+        setEmployees(prev =>
+            prev.filter(employee => employee.id !== id)
+        );
+    };
 
     const filteredEmployees = employees.filter(employee => {
         const matchesSearchTerm = [
@@ -129,7 +138,8 @@ function EmployeeManagement({onMenuClick , isOpen}) {
                     <button className="bg-black text-white p-2 rounded-md hover:bg-gray-800 cursor-pointer">
                         Export Data
                     </button>
-                    <button className="bg-white text-black p-2 rounded-md hover:bg-gray-200 cursor-pointer">
+                    <button onClick={() => navigate("/employees/add")}
+                    className="bg-white text-black p-2 rounded-md hover:bg-gray-200 cursor-pointer">
                         Add Employee
                     </button>
                 </div>
@@ -156,19 +166,13 @@ function EmployeeManagement({onMenuClick , isOpen}) {
 
             {/* employee Directory */}
             {loading ? (
-
-                <div className="flex justify-center items-center h-64">
-                    <LoaderCircle className="animate-spin text-blue-600" size={24} />
-                    <p className="text-blue-600 font-medium">
-                        Loading employees...
-                    </p>
-                </div>
-
+                <Loaders />
             ) : (
 
                 <section className="EmployeeDirectory flex flex-col rounded-md m-4 p-4 bg-white shadow-md">
                     <h2 className="text-lg font-Medium text-gray-900 mb-4">Employee Directory</h2>
-                    <EmployeeTable employees={modifiedEmployees} />
+                    <EmployeeTable employees={modifiedEmployees}
+                    onDelete={handleDeleteEmployee} />
                 </section>
 
             )}

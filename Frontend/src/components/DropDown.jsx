@@ -28,7 +28,7 @@ function CustomDropdown({
                                 setIsOpen(false);
                             }}
                             className="w-full text-left px-3 py-2 hover:bg-gray-100 cursor-pointer">
-                            All Departments
+                            {placeholder}
                         </button>
                         {options.map(option => (
                             <button key={option} type="button" onClick={() => 

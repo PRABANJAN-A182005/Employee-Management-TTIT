@@ -1,8 +1,26 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Eye} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-function EmployeeTable({employees}) {
+import { useState } from "react";
+import DeleteConfirmation from "./DeleteConfirmation.jsx";
+
+function EmployeeTable({employees , onDelete}) {
 
     const navigate = useNavigate();
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+
+    const handleDelete = async () => {
+        try {
+            setDeleting(true);
+            await onDelete(selectedEmployee.id);
+            setSelectedEmployee(null);
+
+        } catch (error) {
+            alert(error.message);
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     return (
         <div className="EmployeeTable max-h-125 overflow-auto rounded-md m-4 p-4 bg-white shadow-md">
@@ -30,21 +48,32 @@ function EmployeeTable({employees}) {
                             </td>
                             <td className="p-2 border-b font-Medium">{employee.department}</td>
                             <td className='p-2 border-b font-Medium'>{employee.position}</td>
-                            <td className='p-2 border-b font-Medium'>{employee.joiningDate}</td>
+                            <td className='p-2 border-b font-Medium'>{new Date(employee.joiningDate).toLocaleDateString("en-IN")}</td>
                             <td className="p-2 border-b font-Medium">{employee.status}</td>
                             <td className="p-2 border-b font-Medium">
                                 <button onClick={() => navigate(`/employees/edit/${employee.id}`)} 
                                 className="text-black hover:bg-gray-200 font-bold py-1 px-2 rounded cursor-pointer">
                                     <Pencil size={16} />
                                 </button>
-                                <button className="text-red-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
+                                <button onClick={() => setSelectedEmployee(employee)}
+                                className="text-red-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
                                     <Trash2 size={16} />
+                                </button>
+                                <button onClick={() => navigate(`/employees/${employee.id}`)}
+                                className="text-blue-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
+                                    <Eye size={16} />
                                 </button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            <DeleteConfirmation
+                employee={selectedEmployee}
+                onCancel={() => setSelectedEmployee(null)}
+                onConfirm={handleDelete}
+                loading={deleting}
+            />
         </div>
     )
 }

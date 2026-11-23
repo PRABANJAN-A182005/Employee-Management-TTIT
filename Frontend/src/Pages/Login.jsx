@@ -63,7 +63,7 @@ function Login() {
 
           <div className="flex justify-between text-sm">
             <label className="flex items-center gap-2">
-              <input type="checkbox" />
+              <input type="checkbox" className='cursor-pointer'/>
               Remember me
             </label>
 
