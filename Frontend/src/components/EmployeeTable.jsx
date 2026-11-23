@@ -1,10 +1,13 @@
 import { Pencil, Trash2 } from "lucide-react";
-function EmployeeCard({employees}) {
+import { useNavigate } from "react-router-dom";
+function EmployeeTable({employees}) {
+
+    const navigate = useNavigate();
 
     return (
-        <div className="EmployeeCard flex flex-col rounded-md m-4 items-start justify-center p-4 bg-white shadow-md">
+        <div className="EmployeeTable max-h-125 overflow-auto rounded-md m-4 p-4 bg-white shadow-md">
             <table className="w-full border-collapse">
-                <thead className="bg-gray-100">
+                <thead className="sticky top-0 z-10 bg-white shadow-sm">
                     <tr className="text-center ">
                         <th className="p-2 border-b font-Medium">ID</th>
                         <th className="p-2 border-b font-Medium">Employee</th>
@@ -30,10 +33,11 @@ function EmployeeCard({employees}) {
                             <td className='p-2 border-b font-Medium'>{employee.joiningDate}</td>
                             <td className="p-2 border-b font-Medium">{employee.status}</td>
                             <td className="p-2 border-b font-Medium">
-                                <button className="text-black hover:bg-gray-200 font-bold py-1 px-2 rounded">
+                                <button onClick={() => navigate(`/employees/edit/${employee.id}`)} 
+                                className="text-black hover:bg-gray-200 font-bold py-1 px-2 rounded cursor-pointer">
                                     <Pencil size={16} />
                                 </button>
-                                <button className="text-red-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2">
+                                <button className="text-red-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
                                     <Trash2 size={16} />
                                 </button>
                             </td>
@@ -45,4 +49,4 @@ function EmployeeCard({employees}) {
     )
 }
 
-export default EmployeeCard
+export default EmployeeTable

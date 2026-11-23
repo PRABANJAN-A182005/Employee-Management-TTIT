@@ -1,22 +1,22 @@
 [
-    {
-        "name": "Human Resources",
-        "count": 12
-    },
-    {
-        "name": "Engineering",
-        "count": 5
-    },
-    {
-        "name": "Marketing",
-        "count": 3
-    },
-    {
-        "name": "Sales",
-        "count": 4
-    },
-    {
-        "name": "Finance",
-        "count": 2
-    }
+  {
+    "count": 5,
+    "department": "IT"
+  },
+  {
+    "count": 2,
+    "department": "HR"
+  },
+  {
+    "count": 8,
+    "department": "Finance"
+  },
+  {
+    "count": 7,
+    "department": "Marketing"
+  },
+  {
+    "count": 8,
+    "department": "Sales"
+  }
 ]

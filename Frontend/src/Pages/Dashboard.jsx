@@ -1,19 +1,28 @@
-import { Bell, Users, ChartNoAxesCombined, CalendarDays, BriefcaseBusiness, User } from "lucide-react";
-import Footer from '../components/Footer.jsx'
-import department from '../data/department.json';
+import { Bell, Users, ChartNoAxesCombined, CalendarDays, BriefcaseBusiness, User, Menu} from "lucide-react";
+import Footer from '../components/Footer.jsx';
+import department from '../data/department.json'
 
-function Dashboard() {
+
+function Dashboard({ onMenuClick }) {
 
     const notificationCount = 3;
 
+
+
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
-            <header className="flex flex-row items-center justify-between p-4 bg-gray-100 border-b shadow-md">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Dashboard</h1>
-                <button className="p-2 rounded-full hover:bg-gray-200">
+            <header className="relative flex flex-row items-center justify-between p-4 bg-gray-100 border-b shadow-md">
+                <button
+          onClick={onMenuClick}
+          className="p-2 rounded-lg hover:bg-gray-200 cursor-pointer"
+        >
+          <Menu size={24} />
+        </button>
+                <h1 className="text-xl font-semibold text-gray-900 mb-4">Dashboard</h1>
+                <button className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
                     <Bell size={24} className="text-gray-700" />
                     {notificationCount > 0 && (
-                        <span className="absolute top-3 right-3 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        <span className="absolute top-4 right-4 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                             {notificationCount}
                         </span>
                     )}
@@ -22,7 +31,7 @@ function Dashboard() {
             {/* Welcome Banner */}
             <section className="WelcomeBanner flex flex-col rounded-md m-4 items-start justify-center p-4 bg-linear-to-r from-blue-500 to-indigo-600">
                 <h1 className="text-2xl font-bold text-white mb-2">Welcome back, HR Manager!</h1>
-                <p className="text-gray-300">Here's an overview of your team metrics and recent activities.</p>
+                <p className="text-gray-300 text-lg">Here's an overview of your team metrics and recent activities.</p>
             </section>
 
             {/*StatsSection */}
@@ -70,9 +79,9 @@ function Dashboard() {
                     </div>
                     <div className="grid grid-cols-1 gap-4 w-full ">
                         {department.map((dept) => (
-                            <div key={dept.name} className="flex flex-col w-full">
+                            <div key={dept.department} className="flex flex-col w-full">
                                 <div className="flex flex-row items-center justify-between w-full">
-                                    <h3 className="text-lg font-semibold text-gray-900">{dept.name}</h3>
+                                    <h3 className="text-lg font-semibold text-gray-900">{dept.department}</h3>
                                     <p className="text-gray-700">{dept.count} Employees</p>
                                 </div>
                                 <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -139,8 +148,29 @@ function Dashboard() {
             </div>
 
             {/* Upcoming Events & Reminders */}
-            <section>
-                
+            <section className="UpcomingEvents flex flex-col rounded-md m-4 p-4 bg-white shadow-md">
+                <h2 className="text-lg font-medium text-gray-900 mb-4">Upcoming Events & Reminders</h2>
+                    <div className="flex flex-row items-center justify-between w-full p-4 bg-amber-200 text-sm rounded-lg">
+                        <div className="flex flex-col gap ">
+                            <h3>Team Meeting</h3>
+                            <p>Engineering Department</p>
+                        </div>
+                        <p>Today, 10:00 AM</p>
+                    </div>
+                     <div className="flex flex-row items-center justify-between w-full p-4 bg-rose-200 text-sm rounded-lg">
+                        <div className="flex flex-col gap ">
+                            <h3> Performance Review</h3>
+                            <p>Marketing</p>
+                        </div>
+                        <p>Tomorrow, 10:00 AM</p>
+                    </div>
+                     <div className="flex flex-row items-center justify-between w-full p-4 bg-green-200 text-sm rounded-lg">
+                        <div className="flex flex-col gap ">
+                            <h3>Annual Business Review</h3>
+                            <p>Finance</p>
+                        </div>
+                        <p>21/11/2026, 10:00 AM</p>
+                    </div>
             </section>
             <Footer />
         </div>
