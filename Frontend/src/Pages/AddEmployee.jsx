@@ -1,5 +1,7 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import useForm from "../hooks/useForm.js";
+import { validation } from "../utils/validation.js";
 import { useNavigate } from "react-router-dom";
 import { Bell, Menu, ArrowLeft, UserPlus, Save } from "lucide-react";
 import Footer from "../components/Footer.jsx";
@@ -9,19 +11,29 @@ function AddEmployee({ onMenuClick, isOpen }) {
 
     const navigate = useNavigate();
 
+    const fieldRefs = useRef({});
+
     const notificationCount = 3;
 
-    const [employee, setEmployee] = useState({
+    const initialValues = {
         name: "",
         email: "",
         department: "",
         position: "",
         joiningDate: "",
         status: ""
-    });
+    };
+
+    const {
+        employee,
+        errors,
+        handleChange,
+        handleSubmit,
+    } = useForm(initialValues, validation);
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [focusRequest, setFocusRequest] = useState(null);
 
     const departments = [
         "Frontend Development",
@@ -38,36 +50,35 @@ function AddEmployee({ onMenuClick, isOpen }) {
         "Cloud Computing",
         "Network Administration"
     ];
+    useEffect(() => {
+        if (!focusRequest) return;
+        fieldRefs.current[focusRequest.field]?.focus();
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+    }, [focusRequest]);
 
-        setEmployee(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const saveEmployee = async (employeeData) => {
         try {
             setLoading(true);
             setError("");
-            const employeeData = {
-                ...employee,
-                name: employee.name.trim(),
-                email: employee.email.trim()
+            const formattedEmployee = {
+                ...employeeData,
+                name: employeeData.name.trim(),
+                email: employeeData.email.trim()
             };
-            
-            await createEmployee(employeeData);
-
+            await createEmployee(formattedEmployee);
             navigate("/employees");
-
         } catch (err) {
             setError(err.message || "Something went wrong");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleInvalid = (validationErrors) => {
+        const firstError = Object.keys(validationErrors)[0];
+        setFocusRequest({
+            field : firstError,
+        });
     };
 
     return (
@@ -112,7 +123,7 @@ function AddEmployee({ onMenuClick, isOpen }) {
                     </button>
                 </div>
                 <form
-                    onSubmit={handleSubmit}
+                    onSubmit={handleSubmit(saveEmployee, handleInvalid)}
                     className="bg-white rounded-lg shadow-md p-6 m-4"
                 >
                     <div className="flex items-center gap-3 mb-6">
@@ -127,38 +138,49 @@ function AddEmployee({ onMenuClick, isOpen }) {
                                 Employee Name *
                             </label>
                             <input
+                                ref={(el) => fieldRefs.current.name = el}
                                 type="text"
                                 name="name"
                                 value={employee.name}
                                 onChange={handleChange}
                                 placeholder="Enter employee name"
-                                required
-                                className="w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500"
+                                className={`w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500
+                                    ${errors.name ? "border-red-500" : "border-gray-300"}`}
                             />
+                            {errors.name && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.name}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block mb-2 font-medium">
                                 Email *
                             </label>
                             <input
+                                ref={(el) => fieldRefs.current.email = el}
                                 type="email"
                                 name="email"
                                 value={employee.email}
                                 onChange={handleChange}
                                 placeholder="Enter email address"
-                                required
                                 className="w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                            {errors.email && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.email}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block mb-2 font-medium">
                                 Department *
                             </label>
                             <select
+                                ref={(el) => fieldRefs.current.department = el}
                                 name="department"
                                 value={employee.department}
                                 onChange={handleChange}
-                                required
                                 className="w-full border rounded-md p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Select Department</option>
@@ -169,43 +191,58 @@ function AddEmployee({ onMenuClick, isOpen }) {
                                     </option>
                                 ))}
                             </select>
+                            {errors.department && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.department}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block mb-2 font-medium">
                                 Position *
                             </label>
                             <input
+                                ref={(el) => fieldRefs.current.position = el}
                                 type="text"
                                 name="position"
                                 value={employee.position}
                                 onChange={handleChange}
                                 placeholder="Enter job position"
-                                required
                                 className="w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                            {errors.position && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.position}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block mb-2 font-medium">
                                 Joining Date *
                             </label>
                             <input
+                                ref={(el) => fieldRefs.current.joiningDate = el}
                                 type="date"
                                 name="joiningDate"
                                 value={employee.joiningDate}
                                 onChange={handleChange}
-                                required
                                 className="w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                            {errors.joiningDate && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.joiningDate}
+                                </p>
+                            )}
                         </div>
                         <div>
                             <label className="block mb-2 font-medium">
                                 Employee Status *
                             </label>
                             <select
+                                ref={(el) => fieldRefs.current.status = el}
                                 name="status"
                                 value={employee.status}
                                 onChange={handleChange}
-                                required
                                 className="w-full border rounded-md p-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
                             >
                                 <option value="">Select Status</option>
@@ -213,6 +250,11 @@ function AddEmployee({ onMenuClick, isOpen }) {
                                 <option value="Probation">Probation</option>
                                 <option value="InActive">InActive</option>
                             </select>
+                            {errors.status && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.status}
+                                </p>
+                            )}
                         </div>
                     </div>
                     {error && (

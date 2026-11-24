@@ -1,13 +1,15 @@
-import { Pencil, Trash2, Eye} from "lucide-react";
+import { Pencil, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import DeleteConfirmation from "./DeleteConfirmation.jsx";
 
-function EmployeeTable({employees , onDelete}) {
+function EmployeeTable({ employees, onDelete }) {
 
     const navigate = useNavigate();
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [deleting, setDeleting] = useState(false);
+    const [sortField, setSortField] = useState("name");
+    const [sortOrder, setSortOrder] = useState("asc");
 
     const handleDelete = async () => {
         try {
@@ -22,10 +24,76 @@ function EmployeeTable({employees , onDelete}) {
         }
     };
 
+    const sortedEmployees = useMemo(() => {
+        return [...employees].sort((a, b) => {
+
+            let valueA = a[sortField];
+            let valueB = b[sortField];
+
+            if (sortField === "joiningDate") {
+                valueA = new Date(valueA).getTime();
+                valueB = new Date(valueB).getTime();
+            }
+
+            else if (sortField === "id") {
+                valueA = Number(valueA);
+                valueB = Number(valueB);
+            }
+
+            else {
+                valueA = String(valueA ?? "").toLowerCase();
+                valueB = String(valueB ?? "").toLowerCase();
+            }
+
+            if (valueA < valueB) {
+                return sortOrder === "asc" ? -1 : 1;
+            }
+
+            if (valueA > valueB) {
+                return sortOrder === "asc" ? 1 : -1;
+            }
+
+            return 0;
+        });
+    }, [employees, sortField, sortOrder]);
+
     return (
-        <div className="EmployeeTable max-h-125 overflow-auto rounded-md m-4 p-4 bg-white shadow-md">
+        <div className="EmployeeTable relative max-h-125 overflow-auto rounded-md pr-2 pl-2 bg-white shadow-md">
+            <div className="sticky top-0 z-50 flex items-center justify-between gap-4 bg-white py-3">
+
+                <div className="flex items-center gap-2">
+                    <label className="font-medium">Sort By:</label>
+
+                    <select
+                        value={sortField}
+                        onChange={(e) => setSortField(e.target.value)}
+                        className="border border-gray-300 rounded-md p-2 outline-none"
+                    >
+                        <option value="name">Employee Name</option>
+                        <option value="id">Employee ID</option>
+                        <option value="department">Department</option>
+                        <option value="position">Position</option>
+                        <option value="joiningDate">Joining Date</option>
+                        <option value="status">Status</option>
+                    </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <label className="font-medium">Order:</label>
+
+                    <select
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                        className="border border-gray-300 rounded-md p-2 outline-none"
+                    >
+                        <option value="asc">Ascending ↑</option>
+                        <option value="desc">Descending ↓</option>
+                    </select>
+                </div>
+
+            </div>
             <table className="w-full border-collapse">
-                <thead className="sticky top-0 z-10 bg-white shadow-sm">
+                <thead className="sticky top-[60px] z-30 bg-white shadow-sm">
                     <tr className="text-center ">
                         <th className="p-2 border-b font-Medium">ID</th>
                         <th className="p-2 border-b font-Medium">Employee</th>
@@ -37,7 +105,7 @@ function EmployeeTable({employees , onDelete}) {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                    {employees.map(employee => (
+                    {sortedEmployees.map(employee => (
                         <tr className="hover:bg-gray-100" key={employee.id}>
                             <td className="p-2 border-b font-Medium">{employee.id}</td>
                             <td className="p-2 border-b font-Medium">
@@ -51,18 +119,20 @@ function EmployeeTable({employees , onDelete}) {
                             <td className='p-2 border-b font-Medium'>{new Date(employee.joiningDate).toLocaleDateString("en-IN")}</td>
                             <td className="p-2 border-b font-Medium">{employee.status}</td>
                             <td className="p-2 border-b font-Medium">
-                                <button onClick={() => navigate(`/employees/edit/${employee.id}`)} 
-                                className="text-black hover:bg-gray-200 font-bold py-1 px-2 rounded cursor-pointer">
-                                    <Pencil size={16} />
-                                </button>
-                                <button onClick={() => setSelectedEmployee(employee)}
-                                className="text-red-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
-                                    <Trash2 size={16} />
-                                </button>
-                                <button onClick={() => navigate(`/employees/${employee.id}`)}
-                                className="text-blue-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
-                                    <Eye size={16} />
-                                </button>
+                                <div className="flex items-center justify-center gap-3">
+                                    <button onClick={() => navigate(`/employees/edit/${employee.id}`)}
+                                        className="text-black hover:bg-gray-200 font-bold py-1 px-2 rounded cursor-pointer">
+                                        <Pencil size={16} />
+                                    </button>
+                                    <button onClick={() => setSelectedEmployee(employee)}
+                                        className="text-red-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
+                                        <Trash2 size={16} />
+                                    </button>
+                                    <button onClick={() => navigate(`/employees/${employee.id}`)}
+                                        className="text-blue-500 hover:bg-gray-200 font-bold py-1 px-2 rounded ml-2 cursor-pointer">
+                                        <Eye size={16} />
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}

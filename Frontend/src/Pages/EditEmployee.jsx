@@ -42,7 +42,6 @@ function EditEmployee({ onMenuClick }) {
                         ? data.joiningDate.slice(0, 10)
                         : ""
                 });
-
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -64,11 +63,10 @@ function EditEmployee({ onMenuClick }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
+
             setSaving(true);
             setError("");
-
             await updateEmployee(id, employee);
             alert("Employee updated successfully!");
             navigate("/employees");

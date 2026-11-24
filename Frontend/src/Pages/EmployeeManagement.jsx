@@ -1,14 +1,12 @@
-import { Bell , Menu , X   } from 'lucide-react';
+import { Bell, Menu, X } from 'lucide-react';
 import EmployeeTable from '../components/EmployeeTable.jsx';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Loaders from '../components/Loaders.jsx'
-// import statusData from "../data/status.json";
-// import employees from '../data/employees.json';
 import DropDown from "../components/DropDown.jsx";
 import { getEmployees, deleteEmployee } from "../services/employeeService.js"
 
-function EmployeeManagement({onMenuClick , isOpen}) {
+function EmployeeManagement({ onMenuClick, isOpen }) {
     const notificationCount = 3;
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -43,6 +41,9 @@ function EmployeeManagement({onMenuClick , isOpen}) {
     };
 
     const filteredEmployees = employees.filter(employee => {
+
+        const search = searchTerm.trim().toLowerCase();
+
         const matchesSearchTerm = [
             employee.name,
             employee.email,
@@ -52,7 +53,7 @@ function EmployeeManagement({onMenuClick , isOpen}) {
             employee.status,
             employee.joiningDate
         ].some(value =>
-            String(value ?? '').toLowerCase().includes(searchTerm)
+            String(value ?? '').toLowerCase().includes(search)
         );
         const matchesDepartment = selectedDepartment === '' || employee.department === selectedDepartment;
         return matchesSearchTerm && matchesDepartment;
@@ -72,20 +73,26 @@ function EmployeeManagement({onMenuClick , isOpen}) {
 
     const employeeStats = employees.reduce((acc, employee) => {
         acc.total++;
-        if (employee.status === 'Active') {
-            acc.active++;
-        } else if(employee.status === 'InActive') {
-            acc.inactive++;
-        }
-        else{
-            acc.Probation++;
+        const status = employee.status?.trim().toLowerCase();
+        switch (status) {
+            case 'active':
+                acc.active++;
+                break;
+            case 'inactive':
+                acc.inactive++;
+                break;
+            case 'probation':
+                acc.probation++;
+                break;
+            default:
+                break;
         }
         return acc;
     }, {
         total: 0,
         active: 0,
         inactive: 0,
-        Probation:0
+        probation: 0
     });
 
     return (
@@ -139,7 +146,7 @@ function EmployeeManagement({onMenuClick , isOpen}) {
                         Export Data
                     </button>
                     <button onClick={() => navigate("/employees/add")}
-                    className="bg-white text-black p-2 rounded-md hover:bg-gray-200 cursor-pointer">
+                        className="bg-white text-black p-2 rounded-md hover:bg-gray-200 cursor-pointer">
                         Add Employee
                     </button>
                 </div>
@@ -168,13 +175,11 @@ function EmployeeManagement({onMenuClick , isOpen}) {
             {loading ? (
                 <Loaders />
             ) : (
-
                 <section className="EmployeeDirectory flex flex-col rounded-md m-4 p-4 bg-white shadow-md">
-                    <h2 className="text-lg font-Medium text-gray-900 mb-4">Employee Directory</h2>
+                    <h2 className="text-lg font-Medium text-gray-900 ">Employee Directory</h2>
                     <EmployeeTable employees={modifiedEmployees}
-                    onDelete={handleDeleteEmployee} />
+                        onDelete={handleDeleteEmployee} />
                 </section>
-
             )}
         </div>
     )
