@@ -38,6 +38,7 @@ export default function useForm(initialValues, validate) {
         errors,
         handleChange,
         handleSubmit,
+        setEmployee
         // resetForm,
     };
 }

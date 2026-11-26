@@ -1,17 +1,41 @@
-
+import useAuth from "../hooks/useAuth.js";
 import { useState } from 'react';
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { Eye, EyeOff } from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import { toast } from "sonner";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const { login, isAuthenticated } = useAuth();
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = (e) => {
-      e.preventDefault();
-  
-      navigate('/dashboard');
+    e.preventDefault();
+
+    setError("");
+
+    const result = login(email, password);
+
+    if (result.success) {
+      toast.success("Login successful");
+      const destination = location.state?.from?.pathname || "/";
+      navigate(destination, { replace: true });
+    } else {
+      setError(result.message);
+      toast.error("Invalid email or password");
+    }
   };
+  if (isAuthenticated) {
+    const destination = location.state?.from?.pathname || "/";
+    return <Navigate to={destination} replace />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -34,7 +58,10 @@ function Login() {
             </label>
             <input
               type="email"
-              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter email"
+              required
               className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -47,8 +74,11 @@ function Login() {
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password"
                 className="w-full border rounded-lg p-3 pr-12 outline-none focus:ring-2 focus:ring-blue-500"
+                required
               />
 
               <button
@@ -59,11 +89,14 @@ function Login() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
+            {error && (
+                <p className="text-red-500">{error}</p>
+              )}
           </div>
 
           <div className="flex justify-between text-sm">
             <label className="flex items-center gap-2">
-              <input type="checkbox" className='cursor-pointer'/>
+              <input type="checkbox" className='cursor-pointer' />
               Remember me
             </label>
 

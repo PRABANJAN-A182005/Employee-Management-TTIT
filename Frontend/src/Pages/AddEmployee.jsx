@@ -1,13 +1,18 @@
-
+import useActivities from "../hooks/useActivities.js";
 import { useState, useRef, useEffect } from "react";
+import { toast } from "sonner";
 import useForm from "../hooks/useForm.js";
+import InputField from "../components/InputField.jsx";
 import { validation } from "../utils/validation.js";
 import { useNavigate } from "react-router-dom";
-import { Bell, Menu, ArrowLeft, UserPlus, Save } from "lucide-react";
+import { ArrowLeft, UserPlus, Save } from "lucide-react";
 import Footer from "../components/Footer.jsx";
 import { createEmployee } from "../services/employeeService.js";
+import Navbar from "../components/Navbar.jsx"
 
 function AddEmployee({ onMenuClick, isOpen }) {
+
+    const { addActivity } = useActivities();
 
     const navigate = useNavigate();
 
@@ -56,53 +61,44 @@ function AddEmployee({ onMenuClick, isOpen }) {
 
     }, [focusRequest]);
 
+
     const saveEmployee = async (employeeData) => {
         try {
-            setLoading(true);
             setError("");
+            setLoading(true);
+
             const formattedEmployee = {
                 ...employeeData,
                 name: employeeData.name.trim(),
                 email: employeeData.email.trim()
             };
+
             await createEmployee(formattedEmployee);
+
+            addActivity("Added", formattedEmployee.name);
+
+            toast.success("Employee added successfully!");
             navigate("/employees");
+
         } catch (err) {
             setError(err.message || "Something went wrong");
+            toast.error("Failed to add employee");
         } finally {
             setLoading(false);
         }
     };
 
+
     const handleInvalid = (validationErrors) => {
         const firstError = Object.keys(validationErrors)[0];
         setFocusRequest({
-            field : firstError,
+            field: firstError,
         });
     };
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
-            <header className={`fixed top-0 right-0 z-50 flex items-center justify-between p-4 bg-gray-100 border-b shadow-md transition-all duration-300
-                ${isOpen ? "left-64" : "left-0"}`}>
-                <button
-                    onClick={onMenuClick}
-                    className="p-2 rounded-lg hover:bg-gray-200 cursor-pointer"
-                >
-                    <Menu size={24} />
-                </button>
-                <h1 className="text-xl font-semibold text-gray-900">
-                    Add Employee
-                </h1>
-                <button className="relative p-2 rounded-full hover:bg-gray-200">
-                    <Bell size={24} />
-                    {notificationCount > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {notificationCount}
-                        </span>
-                    )}
-                </button>
-            </header>
+            <Navbar title="Add Employee" notificationCount={notificationCount} onMenuClick={onMenuClick} isOpen={isOpen} />
             <main className="flex-1 pt-24 p-4">
                 <div className="flex items-center justify-between m-4">
                     <div>
@@ -133,45 +129,30 @@ function AddEmployee({ onMenuClick, isOpen }) {
                         </h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block mb-2 font-medium">
-                                Employee Name *
-                            </label>
-                            <input
-                                ref={(el) => fieldRefs.current.name = el}
-                                type="text"
-                                name="name"
-                                value={employee.name}
-                                onChange={handleChange}
-                                placeholder="Enter employee name"
-                                className={`w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500
-                                    ${errors.name ? "border-red-500" : "border-gray-300"}`}
-                            />
-                            {errors.name && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.name}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block mb-2 font-medium">
-                                Email *
-                            </label>
-                            <input
-                                ref={(el) => fieldRefs.current.email = el}
-                                type="email"
-                                name="email"
-                                value={employee.email}
-                                onChange={handleChange}
-                                placeholder="Enter email address"
-                                className="w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            {errors.email && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.email}
-                                </p>
-                            )}
-                        </div>
+                        <InputField
+                            ref={(el) => fieldRefs.current.name = el}
+                            label="Employee Name"
+                            name="name"
+                            type="text"
+                            value={employee.name}
+                            onChange={handleChange}
+                            placeholder="Enter employee name"
+                            error={errors.name}
+                            required
+                        />
+
+                        <InputField
+                            ref={(el) => fieldRefs.current.email = el}
+                            label="Email"
+                            name="email"
+                            type="email"
+                            value={employee.email}
+                            onChange={handleChange}
+                            placeholder="Enter email address"
+                            error={errors.email}
+                            required
+                        />
+
                         <div>
                             <label className="block mb-2 font-medium">
                                 Department *
@@ -197,43 +178,26 @@ function AddEmployee({ onMenuClick, isOpen }) {
                                 </p>
                             )}
                         </div>
-                        <div>
-                            <label className="block mb-2 font-medium">
-                                Position *
-                            </label>
-                            <input
-                                ref={(el) => fieldRefs.current.position = el}
-                                type="text"
-                                name="position"
-                                value={employee.position}
-                                onChange={handleChange}
-                                placeholder="Enter job position"
-                                className="w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            {errors.position && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.position}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block mb-2 font-medium">
-                                Joining Date *
-                            </label>
-                            <input
-                                ref={(el) => fieldRefs.current.joiningDate = el}
-                                type="date"
-                                name="joiningDate"
-                                value={employee.joiningDate}
-                                onChange={handleChange}
-                                className="w-full border rounded-md p-3 outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            {errors.joiningDate && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {errors.joiningDate}
-                                </p>
-                            )}
-                        </div>
+                        <InputField
+                            ref={(el) => fieldRefs.current.position = el}
+                            label="Position"
+                            name="position"
+                            value={employee.position}
+                            onChange={handleChange}
+                            placeholder="Enter job position"
+                            error={errors.position}
+                            required
+                        />
+                        <InputField
+                            ref={(el) => fieldRefs.current.joiningDate = el}
+                            label="Joining Date"
+                            name="joiningDate"
+                            type="date"
+                            value={employee.joiningDate}
+                            onChange={handleChange}
+                            error={errors.joiningDate}
+                            required
+                        />
                         <div>
                             <label className="block mb-2 font-medium">
                                 Employee Status *

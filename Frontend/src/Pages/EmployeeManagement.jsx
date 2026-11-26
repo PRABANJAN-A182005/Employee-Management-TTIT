@@ -1,12 +1,17 @@
-import { Bell, Menu, X } from 'lucide-react';
+import { Bell, Menu, X, Download } from 'lucide-react';
 import EmployeeTable from '../components/EmployeeTable.jsx';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Loaders from '../components/Loaders.jsx'
 import DropDown from "../components/DropDown.jsx";
 import { getEmployees, deleteEmployee } from "../services/employeeService.js"
+import { exportEmployees } from "../utils/exportEmployees";
+import { toast } from "sonner";
+import StatsSection from '../components/StatsSection.jsx'
+import useActivities from "../hooks/useActivities.js";
 
 function EmployeeManagement({ onMenuClick, isOpen }) {
+    const { addActivity } = useActivities();
     const notificationCount = 3;
     const [employees, setEmployees] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,11 +38,30 @@ function EmployeeManagement({ onMenuClick, isOpen }) {
         fetchData();
     }, []);
 
+
     const handleDeleteEmployee = async (id) => {
-        await deleteEmployee(id);
-        setEmployees(prev =>
-            prev.filter(employee => employee.id !== id)
-        );
+        try {
+            const employee = employees.find(emp => emp.id === id);
+            if (!employee) return;
+            await deleteEmployee(id);
+            addActivity("Deleted", employee.name);
+            setEmployees(prev =>
+                prev.filter(employee => employee.id !== id)
+            );
+            toast.success("Employee deleted successfully!");
+        } catch (err) {
+            toast.error("Failed to delete employee");
+            console.log(err);
+        }
+    };
+
+    const handleExport = () => {
+        const result = exportEmployees(employees);
+        if (result) {
+            toast.success("Employee data exported successfully!");
+        } else {
+            toast.error("No employee data available to export");
+        }
     };
 
     const filteredEmployees = employees.filter(employee => {
@@ -95,6 +119,19 @@ function EmployeeManagement({ onMenuClick, isOpen }) {
         probation: 0
     });
 
+    const employeeStatsData = Object.entries(employeeStats)
+        .map(([key, value]) => ({
+            title: key === "total"
+                ? "Total Employees"
+                : `${key.charAt(0).toUpperCase() + key.slice(1)} Employees`,
+
+            value: value,
+
+            description: key === "total"
+                ? "All employees"
+                : `Currently ${key}`
+        }));
+
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
             <header className={`fixed top-0 right-0 z-50 flex items-center justify-between p-4 bg-gray-100 border-b shadow-md
@@ -122,17 +159,6 @@ function EmployeeManagement({ onMenuClick, isOpen }) {
 
                     <DropDown options={departments} value={selectedDepartment} onChange={setSelectedDepartment} placeholder="All Departments" />
                     <DropDown options={id} value={selectedEmpId} onChange={setSelectedEmpId} placeholder="All Employees ID" />
-
-                    {/* <select className="w-full p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500" 
-                value={selectedEmpId} onChange={(e) => setSelectedEmpId(e.target.value)}>
-                   <option value="">All EID</option>
-                     {filteredEmployees.map(employee => (
-                        <option key={employee.id} value={employee.id}>
-                            {employee.id}
-                        </option>
-                    ))}
-                </select> */}
-
                     <button onClick={() => {
                         setSearchTerm('');
                         setSelectedDepartment('');
@@ -142,7 +168,10 @@ function EmployeeManagement({ onMenuClick, isOpen }) {
                     </button>
                 </div>
                 <div className="flex flex-row gap-4">
-                    <button className="bg-black text-white p-2 rounded-md hover:bg-gray-800 cursor-pointer">
+                    <button
+                        onClick={handleExport}
+                        className="flex items-center gap-2 bg-gray-800 text-white p-2 rounded-md hover:bg-black cursor-pointer">
+                        <Download size={18} />
                         Export Data
                     </button>
                     <button onClick={() => navigate("/employees/add")}
@@ -152,24 +181,7 @@ function EmployeeManagement({ onMenuClick, isOpen }) {
                 </div>
             </div>
 
-            <section className="StatsSection grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 m-4">
-                <article className="StatsArticle flex flex-col rounded-md m-4 items-start justify-center p-4 bg-white shadow-md">
-                    <h1 className="text-2xl font-Medium text-gray-700">{employeeStats.total}</h1>
-                    <h2 className="text-md font-Medium text-gray-500 mb-4">Total Employees</h2>
-                </article>
-                <article className="StatsArticle flex flex-col rounded-md m-4 items-start justify-center p-4 bg-white shadow-md">
-                    <h1 className="text-2xl font-Medium text-green-600">{employeeStats.active}</h1>
-                    <h2 className="text-md font-Medium text-gray-500 mb-4">Active</h2>
-                </article>
-                <article className="StatsArticle flex flex-col rounded-md m-4 items-start justify-center p-4 bg-white shadow-md">
-                    <h1 className="text-2xl font-Medium text-orange-600">{employeeStats.Probation}</h1>
-                    <h2 className="text-md font-Medium text-gray-500 mb-4">On Probation</h2>
-                </article>
-                <article className="StatsArticle flex flex-col rounded-md m-4 items-start justify-center p-4 bg-white shadow-md">
-                    <h1 className="text-2xl font-Medium text-rose-600">{employeeStats.inactive}</h1>
-                    <h2 className="text-md font-Medium text-gray-500 mb-4">Inactive</h2>
-                </article>
-            </section>
+            <StatsSection stats={employeeStatsData} />
 
             {/* employee Directory */}
             {loading ? (

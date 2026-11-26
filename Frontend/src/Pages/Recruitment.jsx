@@ -1,27 +1,15 @@
-import {Bell, Menu} from "lucide-react"
+import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx"
 
-function Recruitment({onMenuClick}) {
+function Recruitment({onMenuClick, isOpen}) {
     const notificationCount= 3;
   return (
     <div className="min-h-screen flex flex-col">
-        <header className="relative flex flex-row items-center justify-between p-4 bg-gray-100 border-b shadow-md">
-                <button onClick={onMenuClick} className="p-2 rounded-lg hover:bg-gray-200 cursor-pointer">
-                    <Menu size={24} />
-                </button>
-                <h1 className="text-xl font-semibold text-gray-900 mb-4">Recruitment</h1>
-                <button className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
-                    <Bell size={24} className="text-gray-700" />
-                    {notificationCount > 0 && (
-                        <span className="absolute top-4 right-4 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {notificationCount}
-                        </span>
-                    )}
-                </button>
-            </header>
+        <Navbar title="Recruitment" notificationCount={notificationCount} onMenuClick={onMenuClick} isOpen={isOpen}/>
+        
             <main className="flex-1">
             {/* Welcome Banner */}
-            <section className="WelcomeBanner flex flex-col rounded-md m-4 items-start justify-center p-4 bg-linear-to-r from-blue-500 to-indigo-600">
+            <section className="WelcomeBanner mt-24 flex flex-col rounded-md m-4 items-start justify-center p-4 bg-linear-to-r from-blue-500 to-indigo-600">
                 <h1 className="text-2xl font-bold text-white mb-2">Recruitment Management</h1>
                 <p className="text-gray-300 text-lg">Manage job postings, track applications, and schedule interviews</p>
             </section>
